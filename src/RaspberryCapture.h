@@ -17,7 +17,7 @@
 #include <mutex>
 
 
-#define PICTURE_BUFFNUM 2
+#define PICTURE_BUFFNUM  2
 
 
 namespace Raspberry{
@@ -26,7 +26,7 @@ typedef struct _ImageType{
     uint32_t width;
     uint32_t height;
     uint32_t imagelen;
-    uint8_t imagebuff;
+    uint8_t *imagebuff;
 }TImageType;
 
 typedef void FHandler(TImageType* info);
@@ -38,6 +38,7 @@ typedef struct _TCameraInfo{
     int height;
     int image_size;
     int frame_number;
+    struct v4l2_format format;
 }TCameraInfo;
 
 class RaspberryCapture{
@@ -52,7 +53,6 @@ public:
     void QueryControl();
     //查询是否支持sensor的参数，最大值，最小值，步进，默认值
     void Query_QueryCtrl();
-
     //查询是否有可用数据
     bool HasAvailableData();
     //
@@ -60,30 +60,70 @@ public:
     void LoopThreadStart();
     void LoopThreadStop();
 
+
+    void _init_mmap();
+    void _uninit_mmap();
     void CaptureON();
     void CaptureOFF();
     int AllocaFrame(uint8_t **outbuff, int *outlen);
     int ReleaseFrame();
     int ioctlVideo(int fd, int request, void* data);
 
+    static bool RecvicedTriggerSignal;
+    void RegisterImageCallback(FHandler* callback);
+    uint32_t GrabPicture(uint8_t* imagebuff, uint32_t imagelen);
+
 private:
+    int m_mode;    //1 --- 回调， 2 == 主动抓图
+    TCameraInfo m_camera;
     //打开相机
     int OpenVideo(const char* videoDev);
     //关闭相机
     void CloseVideo();
 
     int      Camfd;
+
     char* buffdata[PICTURE_BUFFNUM];
     int      bufflength[PICTURE_BUFFNUM];
+
     int      BuffCurrentIndex;   //当前访问的缓冲区号
     char* DeviceName;
 
     std::thread  *mThread;
+
+    FHandler*  m_callback;
     std::mutex   mMutex;
+    std::mutex   m_GrabPictureMutex;
     bool isThreadTerminate;   //线程s是否中断
     bool isClassTerminate;   //类是否收到结束
 
+public:
 
+    bool setGain (int value);
+    int Gain();
+
+    int setWidth(int width);
+    int setHeight(int height);
+
+    int width();
+    int height();
+    void setwidth(int value);
+    void setheight (int value);
+
+    bool setExposureTime(int timeus);         //曝光时间
+    int ExposureTime();
+
+
+    int maxWidth();
+    int maxHeight();
+    int getParam(__u32 id);
+    bool setCtrlParamBool(__u32 id, bool enable);
+    bool setCtrlParamInt(__u32 id , int value);
+    bool getCtrlParamBool(__u32 id);
+    int 	 getCtrlParamInt(__u32 id);
+
+
+    void _setdefaultparams();
 };
 
 

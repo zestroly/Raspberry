@@ -1,20 +1,21 @@
 LIBTARDIR=lib
 
 BASEDIR=$(PWD)
+CC=arm-linux-gnueabihf-gcc
+CXX=arm-linux-gnueabihf-g++
 
 
 INCLUDE= -Iinclude
 LFLAGS= -shared -Wl,-soname,libRaspDriver.so
 CFLAGS= -pipe -g -Wall -W -fPIC
 CXXFLAGS=-pipe -fPIC -std=gnu++11
-LIBS    =  -pthread
+LIBS    =  -pthread -lQt5Core -Llib
 
 TARGET0  =$(LIBTARDIR)/libRaspDriver.so
 SRCDIR  = src
 OBJECTS = $(SRCDIR)/RaspberryCapture.o \
 		  $(SRCDIR)/RaspberryIO.o \
-		  $(SRCDIR)/RaspberryCamera.o \
-		  $(SRCDIR)/libcapture.o 
+		  $(SRCDIR)/RaspberryCamera.o 
 
 all: $(TARGET0) test install
 
@@ -33,18 +34,16 @@ $(TARGET0):$(OBJECTS)
 
 .PHONY:test
 
-testobj = testRaspberrySensor t_libcapture
+testobj = testRaspberrySensor 
 
 testobjtemp := $(testobj:%=bin/%)
 test:$(testobjtemp)
 
-TESTCXXFLAGS = -Iinclude -Llib -std=gnu++11 -Wl,--rpath=./ -lRaspDriver
+TESTCXXFLAGS = -Iinclude -Llib -std=gnu++11 -Wl,--rpath=./ -lRaspDriver -lQt5Core
 
-bin/testRaspberrySensor:test/testRaspSensor.o
+bin/testRaspberrySensor:test/testRaspSensor.o test/rgbtobmp.o
 	$(CXX) $^ -o $@ $(TESTCXXFLAGS) 
 
-bin/t_libcapture:test/t_libcapture.o
-	$(CXX) $^ -o $@ $(TESTCXXFLAGS) 
 
 
 clean:
@@ -52,7 +51,7 @@ clean:
 	rm $(testobjtemp) -rf
 	rm $(OBJECTS) -rf
 	rm $(TARGET0) -rf
-	rm include/* -rf
+	rm include/Raspberry* -rf
 bsp:
 	tar zcvf libdriver.tar.bz include lib doc
 

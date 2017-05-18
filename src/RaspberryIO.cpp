@@ -1,6 +1,9 @@
 #include "RaspberryIO.h"
+#include "RaspberryCamera.h"
 
 namespace Raspberry{
+
+extern bool RaspberryCapture::RecvicedTriggerSignal;
 
 RaspberryIO::RaspberryIO()
 {
@@ -63,7 +66,8 @@ void RaspberryIO::LoopSocketThread(RaspberryIO* pdata)
         ssize_t count = recvfrom(pdata->serverSockfd, recvline, 1024, 0,  NULL, NULL);
         if(count > 0)
         {
-            printf("%s\n", recvline);
+            RaspberryCapture::RecvicedTriggerSignal = true;
+     //       printf("%s\n", recvline);
         }
     }
 

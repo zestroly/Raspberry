@@ -17,7 +17,7 @@ def trigger_backup(channel):
         data = '{EVENT:triger,GPIO:%d,VALUE:1}' % channel
     else:
         data = '{EVENT:triger,GPIO:%d,VALUE:0}' % channel
-    print(data)
+#    print(data)
     udpSendData(data);
 
 GPIO.setmode(GPIO.BOARD)
