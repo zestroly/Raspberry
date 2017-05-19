@@ -1,5 +1,5 @@
-#ifndef  RASPBERRYCAMERA_H
-#define RASPBERRYCAMERA_H
+#ifndef  RASPBERRYDRIVER_H
+#define RASPBERRYDRIVER_H
 
 #include "RaspberryCapture.h"
 #include "RaspberryIO.h"
@@ -9,15 +9,15 @@
 namespace Raspberry {
 
 
-class RaspberryCamera
+class RaspberryDriver
 {
 public:
-    RaspberryCamera();
-    ~RaspberryCamera();
+    RaspberryDriver();
+    ~RaspberryDriver();
 
     void RegisterImageCallback(FHandler* callback);
     uint32_t GrabPicture(uint8_t* imagebuff, uint32_t imagelen);
-
+    int GrabOnePicture(uint8_t** pImagebuff, uint32_t* pImagelen);
 
     bool setExposureTime(int timeus);         //曝光时间
     bool setHorizontalFlip(bool enable); 		//水平镜像
@@ -43,6 +43,10 @@ public:
     int width();
     int height();
 
+    void setIO(int pin, int value);
+    int getIO(int pin);
+
+
 private:
     int maxWidth();
     int maxHeight();
@@ -53,4 +57,4 @@ private:
 };
 
 }
-#endif // RASPBERRYCAMERA_H
+#endif // RASPBERRYDRIVER_H

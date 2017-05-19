@@ -9,13 +9,14 @@ INCLUDE= -Iinclude
 LFLAGS= -shared -Wl,-soname,libRaspDriver.so
 CFLAGS= -pipe -g -Wall -W -fPIC
 CXXFLAGS=-pipe -fPIC -std=gnu++11
-LIBS    =  -pthread -lQt5Core -Llib
+LIBS    =  -pthread -Llib -lwiringPi
 
 TARGET0  =$(LIBTARDIR)/libRaspDriver.so
 SRCDIR  = src
 OBJECTS = $(SRCDIR)/RaspberryCapture.o \
+                  $(SRCDIR)/RaspberryOverlay.o \
 		  $(SRCDIR)/RaspberryIO.o \
-		  $(SRCDIR)/RaspberryCamera.o 
+                  $(SRCDIR)/RaspberryDriver.o
 
 all: $(TARGET0) test install
 
@@ -34,16 +35,19 @@ $(TARGET0):$(OBJECTS)
 
 .PHONY:test
 
-testobj = testRaspberrySensor 
+testobj = testRaspberrySensor  testoverlay
 
 testobjtemp := $(testobj:%=bin/%)
 test:$(testobjtemp)
 
-TESTCXXFLAGS = -Iinclude -Llib -std=gnu++11 -Wl,--rpath=./ -lRaspDriver -lQt5Core
+TESTCXXFLAGS = -Iinclude -Llib -std=gnu++11 -Wl,--rpath=./ -lRaspDriver  -lwiringPi
+
 
 bin/testRaspberrySensor:test/testRaspSensor.o test/rgbtobmp.o
 	$(CXX) $^ -o $@ $(TESTCXXFLAGS) 
 
+bin/testoverlay:test/testoverlay.o
+	$(CXX) $^ -o $@ $(TESTCXXFLAGS)
 
 
 clean:

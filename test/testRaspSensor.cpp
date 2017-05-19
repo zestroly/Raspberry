@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <iostream>
-#include "RaspberryCamera.h"
+#include "RaspberryDriver.h"
 #include "rgbtobmp.h"
 
 using namespace Raspberry;
@@ -20,27 +20,30 @@ void callback(TImageType* info)
 
 int main()
 {
-//    RaspberryCapture* Rcapture = new RaspberryCapture("/dev/video0");
-    RaspberryCamera *Camera =  new RaspberryCamera();
+    RaspberryDriver *Camera =  new RaspberryDriver();
 
     std::cout<<"width:"<<Camera->width ()<<std::endl;
     std::cout<<"height:"<<Camera->height ()<<std::endl;
 
-    Camera->RegisterImageCallback (callback);
-    Camera->setExposureTime (1000);
-    int value = 10;
-    std::cout<<".......\n"<<std::endl;
-    getchar();
-    Camera->setRotate (90);
-    std::cout<<Camera->Rotale ()<<std::endl;
-    getchar();
-    Camera->setRotate (180);
-    std::cout<<Camera->Rotale ()<<std::endl;
-    getchar();
-    Camera->setRotate (270);
-    std::cout<<Camera->Rotale ()<<std::endl;
-    getchar();
+ //   Camera->RegisterImageCallback (callback);
+  //  Camera->setExposureTime (1000);
+   // getchar();
 
+    int value = 10;
+
+    uint8_t *imagebuff;
+    uint32_t imagelen;
+    while(true)
+    {
+        if(Camera->GrabOnePicture (&imagebuff, &imagelen) >=0 )
+        {
+            FILE *pfile = fopen("./cam.jpg", "wb+");
+            fwrite(imagebuff, imagelen,1,pfile);
+            fclose(pfile);
+        }
+        getchar();
+
+    }
 
     int i = 0;
     while(i++ < 10)

@@ -16,6 +16,8 @@ class RaspberryIO
 public:
     RaspberryIO();
     ~RaspberryIO();
+    void setIO(int pin, int value);
+    int getIO(int pin);
     static void LoopSocketThread(RaspberryIO* pdata);
 private:
     bool isClassTerminate;

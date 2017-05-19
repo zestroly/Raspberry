@@ -1,71 +1,10 @@
 #include "RaspberryCapture.h"
+#include "RaspberryPixelFormat.h"
 #include <iostream>
 #include <linux/fb.h>
 
-#include <QtCore/QSettings>
-
-#define ipu_fourcc(a,b,c,d)\
-            (((__u32)(a)<<0)|((__u32)(b)<<8)|((__u32)(c)<<16)|((__u32)(d)<<24))
-
-#define IPU_PIX_FMT_YUV420P2 	ipu_fourcc('Y','U','1','2') /*!< 12 YUV 4:2:0 */
-#define IPU_PIX_FMT_YUV422P 		ipu_fourcc('4','2','2','P') /*!< 16 YUV 4:2:2 */
-#define IPU_PIX_FMT_YUV444  		ipu_fourcc('Y','4','4','4') /*!< 24 YUV 4:4:4 */
-#define IPU_PIX_FMT_RGB565  		ipu_fourcc('R','G','B','P') /*!< 16 RGB-5-6-5 */
-#define IPU_PIX_FMT_BGR24   		ipu_fourcc('B','G','R','3') /*!< 24 BGR-8-8-8 */
-#define IPU_PIX_FMT_BGR32  		 	ipu_fourcc('B','G','R','4') /*!< 32 BGR-8-8-8-8 */
-#define IPU_PIX_FMT_BGRA32  		ipu_fourcc('B','G','R','A') /*!< 32 BGR-8-8-8-8 */
-#define IPU_PIX_FMT_RGB32   		ipu_fourcc('R','G','B','4') /*!< 32 RGB-8-8-8-8 */
-#define IPU_PIX_FMT_RGBA32  		ipu_fourcc('R','G','B','A') /*!< 32 RGB-8-8-8-8 */
-#define IPU_PIX_FMT_ABGR32  		ipu_fourcc('A','B','G','R') /*!< 32 ABGR-8-8-8-8 */
-//Raspberry Camera V1.3
-#define IPU_PIX_FMT_YUV420P 		ipu_fourcc('I','4','2','0') /*!< 12 YUV 4:2:0 */
-#define IPU_PIX_FMT_YUYV    			ipu_fourcc('Y','U','Y','V') /*!< 16 YUV 4:2:2 */
-#define IPU_PIX_FMT_RGB24   		ipu_fourcc('R','G','B','3') /*!< 24 RGB-8-8-8 */
-#define IPU_PIX_FMT_JPEG   		    1195724874U
-#define IPU_PIX_FMT_H264	             875967048U
-#define IPU_PIX_FMT_MOTION_JPEG     1196444237U
-#define IPU_PIX_FMT_YVYU              1431918169
-#define IPU_PIX_FMT_VYUY                  1498765654
-#define IPU_PIX_FMT_PYVU               825382478
-#define IPU_PIX_FMT_UYVY    			ipu_fourcc('U','Y','V','Y') /*!< 16 YUV 4:2:2 */
-#define IPU_PIX_FMT_NV12    			ipu_fourcc('N','V','1','2') /*!< 12 Y/CbCr 4:2:0 */
-#define IPU_PIX_FMT_BGR24   		ipu_fourcc('B','G','R','3') /*!< 24 BGR-8-8-8 */
-#define IPU_PIX_FMT_YCRCB
-#define IPU_PIX_FMT_BGRA32  		ipu_fourcc('B','G','R','A') /*!< 32 BGR-8-8-8-8 */
-
 
 namespace Raspberry{
-
-int bytes_per_pixel(int pixelformat)
-{
-    switch (pixelformat) {
-    case IPU_PIX_FMT_YUV420P:
-    case IPU_PIX_FMT_YUV422P:
-    case IPU_PIX_FMT_NV12:
-        return 1;
-        break;
-    case IPU_PIX_FMT_RGB565:
-    case IPU_PIX_FMT_YUYV:
-    case IPU_PIX_FMT_UYVY:
-        return 2;
-        break;
-    case IPU_PIX_FMT_BGR24:
-    case IPU_PIX_FMT_RGB24:
-        return 3;
-        break;
-    case IPU_PIX_FMT_BGR32:
-    case IPU_PIX_FMT_BGRA32:
-    case IPU_PIX_FMT_RGB32:
-    case IPU_PIX_FMT_RGBA32:
-    case IPU_PIX_FMT_ABGR32:
-        return 4;
-        break;
-    default:
-        return 1;
-        break;
-    }
-    return 0;
-}
 
 RaspberryCapture::RaspberryCapture(const char* dev)
 {
@@ -203,7 +142,7 @@ void RaspberryCapture::QueryFormat()
     bzero(&m_camera.format, sizeof(m_camera.format));
     m_camera.format.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     ioctl(Camfd, VIDIOC_G_FMT, &m_camera.format);
-#if 1
+#if 0
     printf("format.fmt.pix.width:%d\n",  m_camera.format.fmt.pix.width  );
     printf("format.fmt.pix.height:%d\n",  m_camera.format.fmt.pix.height  );
     printf("format.fmt.pix.pixelformat:%d\n",  m_camera.format.fmt.pix.pixelformat  );
@@ -215,9 +154,10 @@ void RaspberryCapture::QueryFormat()
     m_camera.format.fmt.pix.width = 1280;
     m_camera.format.fmt.pix.height = 1024;
   //  format.fmt.pix.pixelformat = 1195724874;//IPU_PIX_FMT_RGB24;
-   // uint32_t pixelformat = IPU_PIX_FMT_RGB24;
-   // uint32_t pixelformat = IPU_PIX_FMT_JPEG
-    uint32_t pixelformat = IPU_PIX_FMT_H264 ;
+    uint32_t pixelformat = IPU_PIX_FMT_JPEG;
+    pixelformat = IPU_PIX_FMT_RGB24;
+    pixelformat = IPU_PIX_FMT_H264 ;
+    pixelformat = IPU_PIX_FMT_BGR24;
     m_camera.format.fmt.pix.pixelformat = pixelformat;
     m_camera.format.fmt.pix.sizeimage = m_camera.format.fmt.pix.width * m_camera.format.fmt.pix.height * bytes_per_pixel(pixelformat);
   //  format.fmt.pix.field = V4L2_FIELD_NONE;
@@ -229,14 +169,15 @@ void RaspberryCapture::QueryFormat()
     }
     ioctl(Camfd, VIDIOC_G_FMT, &m_camera.format);
 
+#if 0
     printf("format.fmt.pix.width:%d\n",  m_camera.format.fmt.pix.width  );
     printf("format.fmt.pix.height:%d\n",  m_camera.format.fmt.pix.height  );
     printf("format.fmt.pix.pixelformat:%d\n",  m_camera.format.fmt.pix.pixelformat  );
     printf("format.fmt.pix.field:%d\n",  m_camera.format.fmt.pix.field  );   //是否行扫描
     printf("format.fmt.pix.bytesperline:%d\n",  m_camera.format.fmt.pix.bytesperline  ); //每行byte数
     printf("format.fmt.pix.sizeimage:%d\n",  m_camera.format.fmt.pix.sizeimage  ); //总共byte数
+#endif
 
-    QuerySensorSupportPictureFormat();
 }
 
 void RaspberryCapture::QueryControl()
@@ -333,24 +274,50 @@ int RaspberryCapture::OpenVideo(const char* videoDev)
     }
 
     //设置图片格
-    QueryFormat();
+//    QueryFormat();
+
+    bzero(&m_camera.format, sizeof(m_camera.format));
+    m_camera.format.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+    ioctl(Camfd, VIDIOC_G_FMT, &m_camera.format);
+
+    m_camera.format.fmt.pix.width = 1920;
+    m_camera.format.fmt.pix.height = 1080;
+    //  format.fmt.pix.pixelformat = 1195724874;//IPU_PIX_FMT_RGB24;
+    uint32_t pixelformat = IPU_PIX_FMT_JPEG;
+    pixelformat = IPU_PIX_FMT_RGB24;
+    pixelformat = IPU_PIX_FMT_BGR24;
+    pixelformat =IPU_PIX_FMT_BGR32 ;
+    pixelformat = IPU_PIX_FMT_H264 ;
+    m_camera.format.fmt.pix.pixelformat = pixelformat;
+    m_camera.format.fmt.pix.sizeimage = m_camera.format.fmt.pix.width * m_camera.format.fmt.pix.height * bytes_per_pixel(pixelformat);
+    //  format.fmt.pix.field = V4L2_FIELD_NONE;
+    m_camera.format.fmt.pix.field = V4L2_FIELD_NONE;
+    m_camera.format.fmt.pix.bytesperline = m_camera.format.fmt.pix.width *bytes_per_pixel (pixelformat);
+    if (ioctl(Camfd, VIDIOC_S_FMT, &m_camera.format) < 0)
+    {
+        printf("error[%d]:VIDIOC_S_FMT\n", __LINE__);
+    }
+    ioctl(Camfd, VIDIOC_G_FMT, &m_camera.format);
+
+   // _setdefaultparams();
+
+    _init_mmap ();
+
 
     struct v4l2_cropcap cropcap;
     bzero(&cropcap, sizeof(cropcap));
     cropcap.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
 #if 0
-     if(ioctl(Camfd, VIDIOC_CROPCAP, &cropcap) == -1)
+    if((ioctl(Camfd, VIDIOC_CROPCAP, &cropcap) == -1) && errno != EINVAL)
     {
         printf("error[%d] :VIDIOC_CROPCAP.........  \n", __LINE__);
         perror("");
     }
 #endif
 
-
-
 #if 0
-     //貌似还不支持这个操作
+    //貌似还不支持这个操作
     //从原始图片中裁剪出矩形
     struct v4l2_crop crop;
     bzero(&crop, sizeof(crop));
@@ -359,84 +326,13 @@ int RaspberryCapture::OpenVideo(const char* videoDev)
     crop.c.height = 320;
     crop.c.top = 10;
     crop.c.left = 10;
-    if(ioctl(Camfd, VIDIOC_G_CROP, &crop) == -1)
+    if( (ioctl(Camfd, VIDIOC_S_CROP, &crop) == -1) && errno != EINVAL)
     {
         printf("error[%d] :VIDIOC_S_CROP..........\n", __LINE__);
         perror("");
-    }
-    exit(0);
-#endif
-    _setdefaultparams();
-
-#if 0
-    struct v4l2_format fmt;
-    bzero(&fmt, sizeof(fmt));
-
-    fmt.type = V4L2_BUF_TYPE_VIDEO_OVERLAY;
-    fmt.fmt.win.w.top = 0;
-    fmt.fmt.win.w.left = 0;
-    fmt.fmt.win.w.height = 600;
-    fmt.fmt.win.w.width  = 800;
-
-    if (ioctl (Camfd, VIDIOC_S_FMT, &fmt) < 0 )
-    {
-        printf("error[%d]:VIDIOC_S_FMT.\n", __LINE__);
         exit(0);
-    }
-
-    struct fb_fix_screeninfo fb0_fix, fb_fg_fix;
-    struct fb_var_screeninfo vinfo;
-    struct v4l2_framebuffer fb;
-    int on =1;
-
-    int fdfb0 = open("/dev/fb0", O_RDWR);
-    if( fdfb0 <  0)
-    {
-        printf("error[%d], open /dev/fb0 error!\n", __LINE__);
-        exit(0);
-    }
-
-    int fbnumber = 0;
-    if(ioctl(Camfd, VIDIOC_S_INPUT, &fbnumber) < 0)
-    {V4L2_CID_EXPOSURE_ABSOLUTE
-        printf("error[%d]:......\n",__LINE__);
-        exit(0);
-    }
-
-    if(ioctl(Camfd, VIDIOC_S_OUTPUT &fbnumber) < 0)
-    {
-        printf("error[%d]:......\n",__LINE__);
-    }
-
-    if(ioctl(Camfd, VIDIOC_G_FBUF, &fb) < 0)
-    {
-        printf("error[%d]:......\n",__LINE__);
-        exit(0);
-    }
-
-    if(ioctl(fdfb0, FBIOGET_VSCREENINFO, &vinfo) < 0);
-    {
-        printf("error[%d],.......... \n", __LINE__);
-    }
-
-    char *fb_addr;
-    if( (fb_addr = (char*)mmap(0, 1024*768*3, PROT_READ|PROT_WRITE, MAP_SHARED, fdfb0, 0) ) == NULL)
-    {
-        printf("error[%d],....mmap...... \n", __LINE__);
-    }
-
-    if(ioctl(fdfb0, FBIOGET_FSCREENINFO, &fb0_fix) < 0);
-    {
-        printf("error[%d],.......... \n", __LINE__);
-    }
-
-
-    if(ioctl(Camfd, VIDIOC_OVERLAY, &on))
-    {
-        printf("error[%d],......... \n", __LINE__);
     }
 #endif
-    _init_mmap ();
     return ret;
 }
 
@@ -487,7 +383,7 @@ int RaspberryCapture::AllocaFrame(uint8_t **outbuff, int *outlen)
     buffer.memory  = V4L2_MEMORY_MMAP;
     xioctl(Camfd, VIDIOC_DQBUF, &buffer) ;
 
-    printf("index:%d, timestamp:%d\n", buffer.index, buffer.timestamp);
+    printf("index:%d, timestamp:%d, decodetime:%d , squeue:%d\n", buffer.index, buffer.timestamp, buffer.timecode, buffer.sequence);
     BuffCurrentIndex = buffer.index;
     *outbuff = (uint8_t*)buffdata[buffer.index];
     *outlen  = fmt.fmt.pix.sizeimage;
@@ -509,29 +405,29 @@ int RaspberryCapture::ReleaseFrame()
     return 0;
 }
 
- void RaspberryCapture::RegisterImageCallback(FHandler* callback)
- {
-     mMutex.lock ();
-     if (callback == NULL && m_callback == NULL)
-     {
+void RaspberryCapture::RegisterImageCallback(FHandler* callback)
+{
+    mMutex.lock ();
+    if (callback == NULL && m_callback == NULL)
+    {
 
-     }else if(callback ==NULL && m_callback != NULL)
-     {
-         m_callback = NULL;
-         m_mode = 0;
-     }else if(callback != NULL && m_callback == NULL)
-     {
+    }else if(callback ==NULL && m_callback != NULL)
+    {
+        m_callback = NULL;
+        m_mode = 0;
+    }else if(callback != NULL && m_callback == NULL)
+    {
         std::cout<<"切换到  callback mode"<<std::endl;
-         m_callback =  callback;
-         m_mode = 1;
-     }else if(callback != NULL && m_callback  != NULL)
-     {
+        m_callback =  callback;
+        m_mode = 1;
+    }else if(callback != NULL && m_callback  != NULL)
+    {
         std::cout<<"更换  callback 函数"<<std::endl;
-         m_callback =  callback;
-         m_mode = 1;
-     }
-     mMutex.unlock ();
- }
+        m_callback =  callback;
+        m_mode = 1;
+    }
+    mMutex.unlock ();
+}
 
 
 uint32_t RaspberryCapture::GrabPicture(uint8_t* imagebuff, uint32_t imagelen)
@@ -560,6 +456,67 @@ uint32_t RaspberryCapture::GrabPicture(uint8_t* imagebuff, uint32_t imagelen)
     m_GrabPictureMutex.unlock ();
     return count;
 }
+
+
+int RaspberryCapture::GrabPicture(uint8_t** imagebuff, uint32_t* imagelen)
+{
+    struct v4l2_buffer buffer={0};
+    int i;
+    for(i = 0 ; i< 3 ;i++)
+    {
+
+        //释放缓存，放入队列
+        buffer.type         = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+        buffer.memory  = V4L2_MEMORY_MMAP;
+        buffer.index       =   0;
+        if(ioctl(Camfd, VIDIOC_QBUF, &buffer))
+        {
+            printf("error: VIDIOC_QBUF!.");
+            xioctl(Camfd, VIDIOC_DQBUF, &buffer) ;
+            return -1;
+        }
+
+        //监听数据
+        for(;;)
+        {
+            fd_set fds;
+            struct timeval tv;
+            FD_ZERO(&fds);
+            FD_SET(Camfd, &fds);
+            tv.tv_sec = 2;
+            tv.tv_usec = 0;
+            int ret = select (Camfd+1, &fds, NULL, NULL, &tv);
+            if(ret > 0)
+                break;
+        }
+
+
+        //申请缓存，取出队列
+        bzero(&buffer, sizeof(buffer));
+        buffer.type         = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+        buffer.memory  = V4L2_MEMORY_MMAP;
+        xioctl(Camfd, VIDIOC_DQBUF, &buffer) ;
+
+        struct v4l2_format fmt={0};
+        fmt.type   =  V4L2_BUF_TYPE_VIDEO_CAPTURE;
+        if (ioctl (Camfd, VIDIOC_G_FMT, &fmt) < 0 )
+            printf("error:VIDIOC_G_FMT.\n");
+
+        *imagebuff = (uint8_t*)buffdata[buffer.index];
+        *imagelen = buffer.length;
+        printf("sizeimage:%d , bytesused:%d, lenght:%d, timestamp:%d ", *imagelen, buffer.bytesused, buffer.length, buffer.timestamp);
+        printf("field:%d ", buffer.field);
+        printf("\n");
+    }
+    return 0;
+
+
+}
+
+
+
+
+
 
 void RaspberryCapture::LoopThreadPicture(RaspberryCapture* Rcapture)
 {
@@ -875,7 +832,7 @@ bool RaspberryCapture::setGain (int value)
     ctrl.value = value ;
     if(ioctl(Camfd, VIDIOC_S_CTRL, &ctrl) < 0)
     {
-       std::cout<<"set gain failed!" <<std::endl;
+        std::cout<<"set gain failed!" <<std::endl;
     }
 
     getchar();
@@ -883,7 +840,7 @@ bool RaspberryCapture::setGain (int value)
     ctrl.value = 1 ;
     if(ioctl(Camfd, VIDIOC_S_CTRL, &ctrl) < 0)
     {
-       std::cout<<"set vertical filep failed!" <<std::endl;
+        std::cout<<"set vertical filep failed!" <<std::endl;
     }
 
     getchar();
@@ -892,7 +849,7 @@ bool RaspberryCapture::setGain (int value)
     ctrl.value = 1 ;
     if(ioctl(Camfd, VIDIOC_S_CTRL, &ctrl) < 0)
     {
-       std::cout<<"set vertical filep failed!" <<std::endl;
+        std::cout<<"set vertical filep failed!" <<std::endl;
     }
 
 

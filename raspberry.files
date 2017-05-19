@@ -2,10 +2,15 @@ src/RaspberryCapture.cpp
 src/RaspberryCapture.h
 test/testRaspSensor.cpp
 script/loopGpio.py
-src/RaspberryCamera.h
-src/RaspberryCamera.cpp
+src/RaspberryDriver.h
+src/RaspberryDriver.cpp
 src/RaspberryIO.h
 src/RaspberryIO.cpp
 script/camera.py
 test/rgbtobmp.cpp
 test/rgbtobmp.h
+Makefile
+src/RaspberryOverlay.h
+src/RaspberryOverlay.cpp
+test/testoverlay.cpp
+src/RaspberryPixelFormat.h

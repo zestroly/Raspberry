@@ -17,7 +17,7 @@
 #include <mutex>
 
 
-#define PICTURE_BUFFNUM  2
+#define PICTURE_BUFFNUM  1
 
 
 namespace Raspberry{
@@ -73,6 +73,8 @@ public:
     void RegisterImageCallback(FHandler* callback);
     uint32_t GrabPicture(uint8_t* imagebuff, uint32_t imagelen);
 
+    int GrabPicture(uint8_t** imagebuff, uint32_t* imagelen);
+
 private:
     int m_mode;    //1 --- 回调， 2 == 主动抓图
     TCameraInfo m_camera;
@@ -121,7 +123,6 @@ public:
     bool setCtrlParamInt(__u32 id , int value);
     bool getCtrlParamBool(__u32 id);
     int 	 getCtrlParamInt(__u32 id);
-
 
     void _setdefaultparams();
 };

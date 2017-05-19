@@ -1,142 +1,157 @@
-#include "RaspberryCamera.h"
+#include "RaspberryDriver.h"
 
 namespace Raspberry{
 
-RaspberryCamera::RaspberryCamera()
+RaspberryDriver::RaspberryDriver()
 {
     RCapture = new RaspberryCapture("/dev/video0");
     RIO          =  new RaspberryIO;
 
 }
 
-void RaspberryCamera::RegisterImageCallback(FHandler* callback)
+void RaspberryDriver::RegisterImageCallback(FHandler* callback)
 {
     RCapture->RegisterImageCallback (callback);
 }
 
-uint32_t RaspberryCamera::GrabPicture(uint8_t* imagebuff, uint32_t imagelen)
+uint32_t RaspberryDriver::GrabPicture(uint8_t* imagebuff, uint32_t imagelen)
 {
     return RCapture->GrabPicture(imagebuff, imagelen);
 }
 
-RaspberryCamera::~RaspberryCamera()
+int RaspberryDriver::GrabOnePicture(uint8_t** pImagebuff, uint32_t* pImagelen)
+{
+   return RCapture->GrabPicture (pImagebuff, pImagelen);
+}
+
+
+RaspberryDriver::~RaspberryDriver()
 {
     delete RCapture;
     delete RIO;
 }
 
-bool RaspberryCamera::setGain(int value)
+bool RaspberryDriver::setGain(int value)
 {
     return RCapture->setGain(value);
 }
 
-int RaspberryCamera::Gain ()
+int RaspberryDriver::Gain ()
 {
     return RCapture->Gain();
 }
 
-bool RaspberryCamera::setExposureTime(int timeus)
+bool RaspberryDriver::setExposureTime(int timeus)
 {
     return RCapture->setExposureTime (timeus);
 }
 
-int RaspberryCamera::ExposureTime()
+int RaspberryDriver::ExposureTime()
 {
     return RCapture->ExposureTime ();
 }
 
-int RaspberryCamera::width()
+int RaspberryDriver::width()
 {
     return RCapture->width ();
 }
 
-int RaspberryCamera::height()
+int RaspberryDriver::height()
 {
     return RCapture->height ();
 }
 
-int RaspberryCamera::maxWidth()
+int RaspberryDriver::maxWidth()
 {
 
     return 0;
 }
 
-int RaspberryCamera::maxHeight()
+int RaspberryDriver::maxHeight()
 {
 
     return 0;
 }
 
 
-bool RaspberryCamera::setHorizontalFlip(bool enable) 		//水平镜像
+bool RaspberryDriver::setHorizontalFlip(bool enable) 		//水平镜像
 {
     return RCapture->setCtrlParamBool (V4L2_CID_HFLIP, enable);
 }
 
-bool RaspberryCamera::setVerticalFlip(bool enable) 			//垂直镜像
+bool RaspberryDriver::setVerticalFlip(bool enable) 			//垂直镜像
 {
     return RCapture->setCtrlParamBool (V4L2_CID_VFLIP, enable);
 }
-bool RaspberryCamera::setSaturation(int value)   				//饱和度   minimum(-100), maximun(100), step(1), defalut_value(0)
+bool RaspberryDriver::setSaturation(int value)   				//饱和度   minimum(-100), maximun(100), step(1), defalut_value(0)
 {
     return RCapture->setCtrlParamInt (V4L2_CID_SATURATION, value);
 }
-bool RaspberryCamera::setContrast(int value)    					//对比度    minimum(-100), maximun(100), step(1), defalut_value(0)
+bool RaspberryDriver::setContrast(int value)    					//对比度    minimum(-100), maximun(100), step(1), defalut_value(0)
 {
     return RCapture->setCtrlParamInt (V4L2_CID_CONTRAST, value);
 }
-bool RaspberryCamera::setBrightness(int value) 					//亮度       minimum(0), maximun(100), step(1), defalut_value(50)
+bool RaspberryDriver::setBrightness(int value) 					//亮度       minimum(0), maximun(100), step(1), defalut_value(50)
 {
     return RCapture->setCtrlParamInt (V4L2_CID_BRIGHTNESS, value);
 }
-bool RaspberryCamera::setBlueBalance(int value)  				//minimum(1), maximun(7999), step(1), defalut_value(1000)
+bool RaspberryDriver::setBlueBalance(int value)  				//minimum(1), maximun(7999), step(1), defalut_value(1000)
 {
     return RCapture->setCtrlParamInt (V4L2_CID_BLUE_BALANCE, value);
 }
-bool RaspberryCamera::setRedBalance(int value)   				//minimum(1), maximun(7999), step(1), defalut_value(1000)
+bool RaspberryDriver::setRedBalance(int value)   				//minimum(1), maximun(7999), step(1), defalut_value(1000)
 {
     return RCapture->setCtrlParamInt (V4L2_CID_RED_BALANCE, value);
 }
 
-bool RaspberryCamera::setRotate(int value)      //旋转角度   minimum(0), maximun(360), step(90), defalut_value(0)
+bool RaspberryDriver::setRotate(int value)      //旋转角度   minimum(0), maximun(360), step(90), defalut_value(0)
 {
     return RCapture->setCtrlParamInt (V4L2_CID_ROTATE, value);
 }
 
-int RaspberryCamera::Rotale ()
+int RaspberryDriver::Rotale ()
 {
     return RCapture->getCtrlParamInt (V4L2_CID_ROTATE);
 }
 
-bool RaspberryCamera::HorizontalFlip()
+bool RaspberryDriver::HorizontalFlip()
 {
     return RCapture->getCtrlParamBool (V4L2_CID_HFLIP);
 }
-bool RaspberryCamera::VerticalFlip()
+bool RaspberryDriver::VerticalFlip()
 {
     return RCapture->getCtrlParamBool (V4L2_CID_VFLIP);
 }
-int RaspberryCamera::Saturation()
+int RaspberryDriver::Saturation()
 {
     return RCapture->getCtrlParamInt (V4L2_CID_SATURATION);
 }
-int RaspberryCamera::Contrast()
+int RaspberryDriver::Contrast()
 {
     return RCapture->getCtrlParamInt (V4L2_CID_CONTRAST);
 }
-int RaspberryCamera::Brightness()
+int RaspberryDriver::Brightness()
 {
     return RCapture->getCtrlParamInt (V4L2_CID_BRIGHTNESS);
 }
-int RaspberryCamera::BlueBalance()
+int RaspberryDriver::BlueBalance()
 {
     return RCapture->getCtrlParamInt (V4L2_CID_BLUE_BALANCE);
 }
-int RaspberryCamera::RedBalance()
+int RaspberryDriver::RedBalance()
 {
     return RCapture->getCtrlParamInt (V4L2_CID_RED_BALANCE);
 }
 
+void RaspberryDriver::setIO(int pin, int value)
+{
+    RIO->setIO(pin, value);
+}
+
+int RaspberryDriver::getIO(int pin)
+{
+    return 0;
+}
 
 
 }

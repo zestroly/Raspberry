@@ -26,8 +26,8 @@ GPIO.setup(12, GPIO.IN)
 GPIO.add_event_detect(11 , GPIO.FALLING, callback=trigger_backup, bouncetime=200)
 GPIO.add_event_detect(12 , GPIO.FALLING, callback=trigger_backup, bouncetime=200)
 
-GPIO.setup(15,GPIO.OUT,initial =0)
-GPIO.setup(16,GPIO.OUT,initial =0)
+#GPIO.setup(15,GPIO.OUT,initial =0)
+#GPIO.setup(16,GPIO.OUT,initial =0)
 
 
 print("a simple udp server start.")

@@ -1,6 +1,7 @@
 #include "RaspberryIO.h"
-#include "RaspberryCamera.h"
+#include "RaspberryDriver.h"
 
+#include <wiringPi.h>
 namespace Raspberry{
 
 extern bool RaspberryCapture::RecvicedTriggerSignal;
@@ -44,8 +45,26 @@ RaspberryIO::RaspberryIO()
 
     isClassTerminate = false;
     SocketThread = new std::thread(LoopSocketThread , this);
+
+    //初始化wiringPi
+    wiringPiSetup();
+    pinMode(3, OUTPUT);
+    pinMode(4, OUTPUT);
 }
 
+void RaspberryIO::setIO(int pin, int value)
+{
+    if(value == 1)
+        digitalWrite(pin, HIGH);
+    else
+        digitalWrite(pin, LOW);
+}
+
+int RaspberryIO::getIO(int pin)
+{
+
+
+}
 
 RaspberryIO::~RaspberryIO()
 {
@@ -67,7 +86,7 @@ void RaspberryIO::LoopSocketThread(RaspberryIO* pdata)
         if(count > 0)
         {
             RaspberryCapture::RecvicedTriggerSignal = true;
-     //       printf("%s\n", recvline);
+            //       printf("%s\n", recvline);
         }
     }
 
