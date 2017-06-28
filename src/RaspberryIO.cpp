@@ -66,6 +66,12 @@ int RaspberryIO::getIO(int pin)
 
 }
 
+ int RaspberryIO::setIoEdge(int channel, int edge, int Bouncetime)
+ {
+     char buff[200] = "{\"Event\":\"Triger\",\"Channel\":11,\"Edge\":\"Rising\",\"Bouncetime\":200}";
+  //   ssize_t count = sendto(clientSockfd , buff, strlen(buff), 0, NULL, NULL );
+ }
+
 RaspberryIO::~RaspberryIO()
 {
     isClassTerminate = true;
@@ -86,7 +92,7 @@ void RaspberryIO::LoopSocketThread(RaspberryIO* pdata)
         if(count > 0)
         {
             RaspberryCapture::RecvicedTriggerSignal = true;
-            //       printf("%s\n", recvline);
+            //printf("%s\n", recvline);
         }
     }
 

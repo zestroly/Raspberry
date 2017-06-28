@@ -103,8 +103,6 @@ int cam_capabilitycaps(int fd)
 
 void RaspberryCapture::QuerySensorSupportPictureFormat()
 {
- //   cam_capabilitycaps(Camfd);
-
     int ret;
     struct v4l2_fmtdesc fmtdesc;
     struct v4l2_frmsizeenum frmsize;
@@ -151,18 +149,19 @@ void RaspberryCapture::QueryFormat()
     printf("format.fmt.pix.sizeimage:%d\n",  m_camera.format.fmt.pix.sizeimage  ); //总共byte数
 #endif
 
-    m_camera.format.fmt.pix.width = 1280;
-    m_camera.format.fmt.pix.height = 1024;
+    m_camera.format.fmt.pix.width = 1296;
+    m_camera.format.fmt.pix.height = 972;
   //  format.fmt.pix.pixelformat = 1195724874;//IPU_PIX_FMT_RGB24;
-    uint32_t pixelformat = IPU_PIX_FMT_JPEG;
-    pixelformat = IPU_PIX_FMT_RGB24;
-    pixelformat = IPU_PIX_FMT_H264 ;
-    pixelformat = IPU_PIX_FMT_BGR24;
-    m_camera.format.fmt.pix.pixelformat = pixelformat;
-    m_camera.format.fmt.pix.sizeimage = m_camera.format.fmt.pix.width * m_camera.format.fmt.pix.height * bytes_per_pixel(pixelformat);
+    m_camera.pixelformat = IPU_PIX_FMT_JPEG;
+    m_camera.pixelformat = IPU_PIX_FMT_RGB24;
+    m_camera.pixelformat = IPU_PIX_FMT_BGR24;
+    m_camera.pixelformat = IPU_PIX_FMT_H264 ;
+    m_camera.format.fmt.pix.pixelformat = m_camera.pixelformat;
+    m_camera.pixelbytes = bytes_per_pixel(m_camera.pixelformat);
+    m_camera.format.fmt.pix.sizeimage = m_camera.format.fmt.pix.width * m_camera.format.fmt.pix.height * m_camera.pixelbytes;
   //  format.fmt.pix.field = V4L2_FIELD_NONE;
     m_camera.format.fmt.pix.field = V4L2_FIELD_NONE;
-    m_camera.format.fmt.pix.bytesperline = m_camera.format.fmt.pix.width *bytes_per_pixel (pixelformat);
+    m_camera.format.fmt.pix.bytesperline = m_camera.format.fmt.pix.width *m_camera.pixelbytes;
     if (ioctl(Camfd, VIDIOC_S_FMT, &m_camera.format) < 0)
     {
         printf("error[%d]:VIDIOC_S_FMT\n", __LINE__);
@@ -239,7 +238,7 @@ int RaspberryCapture::OpenVideo(const char* videoDev)
     parm.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     parm.parm.capture.capability = V4L2_CAP_TIMEPERFRAME;
     parm.parm.capture.timeperframe.numerator = 1;
-    parm.parm.capture.timeperframe.denominator = 15; //设置帧数
+    parm.parm.capture.timeperframe.denominator = 30; //设置帧数
    // parm.parm.capture.capturemode = V4L2_MODE_HIGHQUALITY;
     parm.parm.capture.capturemode = 0;
     parm.parm.capture.extendedmode = 0;
@@ -283,10 +282,11 @@ int RaspberryCapture::OpenVideo(const char* videoDev)
     m_camera.format.fmt.pix.width = 1920;
     m_camera.format.fmt.pix.height = 1080;
     //  format.fmt.pix.pixelformat = 1195724874;//IPU_PIX_FMT_RGB24;
-    uint32_t pixelformat = IPU_PIX_FMT_JPEG;
-    pixelformat = IPU_PIX_FMT_RGB24;
+    uint32_t  pixelformat;
     pixelformat = IPU_PIX_FMT_BGR24;
     pixelformat =IPU_PIX_FMT_BGR32 ;
+    pixelformat = IPU_PIX_FMT_JPEG;
+    pixelformat = IPU_PIX_FMT_RGB24;
     pixelformat = IPU_PIX_FMT_H264 ;
     m_camera.format.fmt.pix.pixelformat = pixelformat;
     m_camera.format.fmt.pix.sizeimage = m_camera.format.fmt.pix.width * m_camera.format.fmt.pix.height * bytes_per_pixel(pixelformat);
@@ -303,11 +303,9 @@ int RaspberryCapture::OpenVideo(const char* videoDev)
 
     _init_mmap ();
 
-
     struct v4l2_cropcap cropcap;
     bzero(&cropcap, sizeof(cropcap));
     cropcap.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-
 #if 0
     if((ioctl(Camfd, VIDIOC_CROPCAP, &cropcap) == -1) && errno != EINVAL)
     {
@@ -322,11 +320,11 @@ int RaspberryCapture::OpenVideo(const char* videoDev)
     struct v4l2_crop crop;
     bzero(&crop, sizeof(crop));
     crop.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-    crop.c.width =  480;
-    crop.c.height = 320;
-    crop.c.top = 10;
-    crop.c.left = 10;
-    if( (ioctl(Camfd, VIDIOC_S_CROP, &crop) == -1) && errno != EINVAL)
+    crop.c.width =  720;
+    crop.c.height = 972;
+    crop.c.top = 0;
+    crop.c.left = 0;
+    if( (ioctl(Camfd, VIDIOC_S_CROP, &crop) < 0)  )
     {
         printf("error[%d] :VIDIOC_S_CROP..........\n", __LINE__);
         perror("");
@@ -842,8 +840,6 @@ bool RaspberryCapture::setGain (int value)
     {
         std::cout<<"set vertical filep failed!" <<std::endl;
     }
-
-    getchar();
 
     ctrl.id = V4L2_CID_HFLIP;
     ctrl.value = 1 ;

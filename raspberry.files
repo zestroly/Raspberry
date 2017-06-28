@@ -1,5 +1,7 @@
 src/RaspberryCapture.cpp
 src/RaspberryCapture.h
+src/RaspberryI2CBus.cpp
+src/RaspberryI2CBus.h
 test/testRaspSensor.cpp
 script/loopGpio.py
 src/RaspberryDriver.h
@@ -12,5 +14,8 @@ test/rgbtobmp.h
 Makefile
 src/RaspberryOverlay.h
 src/RaspberryOverlay.cpp
+test/testi2c.cpp
 test/testoverlay.cpp
 src/RaspberryPixelFormat.h
+src/RaspberryLog.h
+src/RaspberryLog.cpp

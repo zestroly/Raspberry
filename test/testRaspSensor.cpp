@@ -25,25 +25,11 @@ int main()
     std::cout<<"width:"<<Camera->width ()<<std::endl;
     std::cout<<"height:"<<Camera->height ()<<std::endl;
 
- //   Camera->RegisterImageCallback (callback);
+    Camera->RegisterImageCallback (callback);
   //  Camera->setExposureTime (1000);
-   // getchar();
+    Camera->setOverlay (RaspberryOverlay::ON);
+   getchar();
 
-    int value = 10;
-
-    uint8_t *imagebuff;
-    uint32_t imagelen;
-    while(true)
-    {
-        if(Camera->GrabOnePicture (&imagebuff, &imagelen) >=0 )
-        {
-            FILE *pfile = fopen("./cam.jpg", "wb+");
-            fwrite(imagebuff, imagelen,1,pfile);
-            fclose(pfile);
-        }
-        getchar();
-
-    }
 
     int i = 0;
     while(i++ < 10)

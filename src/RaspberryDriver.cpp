@@ -6,6 +6,7 @@ RaspberryDriver::RaspberryDriver()
 {
     RCapture = new RaspberryCapture("/dev/video0");
     RIO          =  new RaspberryIO;
+    ROverlay = new  RaspberryOverlay();
 
 }
 
@@ -29,6 +30,7 @@ RaspberryDriver::~RaspberryDriver()
 {
     delete RCapture;
     delete RIO;
+    delete ROverlay;
 }
 
 bool RaspberryDriver::setGain(int value)
@@ -151,6 +153,16 @@ void RaspberryDriver::setIO(int pin, int value)
 int RaspberryDriver::getIO(int pin)
 {
     return 0;
+}
+
+int RaspberryDriver::setDisplayArea(int top,int left, int width, int height)
+{
+    return ROverlay->setDisplayArea (top, left, width, height);
+}
+
+void RaspberryDriver::setOverlay(RaspberryOverlay::TStatus  status)
+{
+    ROverlay->setOverlay(status);
 }
 
 
